@@ -37,7 +37,8 @@ def _refresh_token_if_needed(market_url: str) -> str | None:
             timeout=30,
         )
         if resp.status_code == 200:
-            data = resp.json()
+            body = resp.json()
+            data = body.get("data", body)
             new_access = data["access_token"]
             new_refresh = data.get("refresh_token", refresh)
             save_auth(access_token=new_access, refresh_token=new_refresh)
@@ -183,19 +184,24 @@ def publish(plugin_dir: str, changelog: str | None, is_new: bool) -> None:
         )
 
     if resp.status_code in (200, 201):
-        data = resp.json()
-        status = data.get("status", "submitted")
+        body = resp.json()
+        # Support both {status, ...} and {code, data: {...}}
+        data = body.get("data", body)
+        status = data.get("review_status", data.get("status", "submitted"))
         console.print()
         console.print("[green bold]Published successfully![/green bold]")
         console.print(f"  Plugin:  [cyan]{schema.name}[/cyan] v{schema.version}")
         console.print(f"  Status:  {status}")
-        if "url" in data:
+        if data.get("url"):
             console.print(f"  URL:     {data['url']}")
+        if data.get("id"):
+            console.print(f"  ID:      {data['id']}")
     else:
         console.print()
         console.print(f"[red bold]Publish failed ({resp.status_code})[/red bold]")
         try:
-            detail = resp.json().get("detail", resp.text)
+            body = resp.json()
+            detail = body.get("detail") or body.get("message") or resp.text
         except Exception:
             detail = resp.text
         console.print(f"  [red]{detail}[/red]")

@@ -70,13 +70,22 @@ def login(
             raise SystemExit(1)
 
     if resp.status_code == 200:
-        data = resp.json()
+        body = resp.json()
+        # Support both {access_token, ...} and {code, data: {access_token, ...}}
+        data = body.get("data", body)
         save_auth(
             access_token=data["access_token"],
             refresh_token=data.get("refresh_token"),
             market_url=url,
         )
-        console.print("[green]Login successful![/green]")
+        user = data.get("user", {})
+        if user:
+            console.print(
+                f"[green]Login successful![/green] "
+                f"({user.get('email', '')} / {user.get('role', '')})"
+            )
+        else:
+            console.print("[green]Login successful![/green]")
     elif resp.status_code == 401:
         console.print("[red]Invalid email or password.[/red]")
         raise SystemExit(1)
