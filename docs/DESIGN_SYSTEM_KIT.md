@@ -7,82 +7,145 @@
 
 ## Table of Contents
 
-1. [Color Tokens](#1-color-tokens)
-2. [Typography](#2-typography)
-3. [Spacing & Layout](#3-spacing--layout)
-4. [Component Patterns](#4-component-patterns)
-5. [Do's and Don'ts](#5-dos-and-donts)
-6. [Accessibility](#6-accessibility)
-7. [Dark Theme Notes](#7-dark-theme-notes)
+1. [Theme Support](#1-theme-support)
+2. [Color Tokens](#2-color-tokens)
+3. [Typography](#3-typography)
+4. [Spacing & Layout](#4-spacing--layout)
+5. [Component Patterns](#5-component-patterns)
+6. [Do's and Don'ts](#6-dos-and-donts)
+7. [Accessibility](#7-accessibility)
+8. [Dark Theme Notes](#8-dark-theme-notes)
 
 ---
 
-## 1. Color Tokens
+## 1. Theme Support
 
-The Panel uses a dark-first design system. All colors are available as CSS custom properties injected by the host application.
+The ADMINCHAT Panel supports a **dual theme system**: dark mode (default) and light mode. The user can toggle between themes in the Panel settings.
 
-### Backgrounds
+### How It Works
 
-| Token | Hex | CSS Variable | Usage |
-|-------|-----|--------------|-------|
-| Page Background | `#0C0C0C` | `var(--acp-bg-page)` | Main page background |
-| Sidebar Background | `#080808` | `var(--acp-bg-sidebar)` | Sidebar and navigation |
-| Card Background | `#0A0A0A` | `var(--acp-bg-card)` | Cards, panels, sections |
-| Elevated Background | `#141414` | `var(--acp-bg-elevated)` | Inputs, dropdowns, modals, hover states |
-| Hover State | `#1A1A1A` | `var(--acp-bg-hover)` | Table row hover, list item hover |
+- The host Panel injects CSS custom properties (`--color-*`) into the plugin iframe/container.
+- When the user toggles the theme, all `--color-*` variable values update automatically.
+- Plugins that use `var(--color-*)` in their styles will adapt to the active theme with zero extra work.
 
-### Accent & Status
+### Rules for Plugin Developers
 
-| Token | Hex | CSS Variable | Usage |
-|-------|-----|--------------|-------|
-| Primary Accent | `#00D9FF` | `var(--acp-accent)` | Primary buttons, links, active states, focus rings |
-| Accent Muted | `#00D9FF1A` | `var(--acp-accent-muted)` | Accent backgrounds (10% opacity) |
-| Success | `#059669` | `var(--acp-success)` | Active, approved, online, running |
-| Success Muted | `#0596691A` | `var(--acp-success-muted)` | Success backgrounds (10% opacity) |
-| Warning | `#FF8800` | `var(--acp-warning)` | Pending, warning, queued |
-| Warning Muted | `#FF88001A` | `var(--acp-warning-muted)` | Warning backgrounds (10% opacity) |
-| Error | `#FF4444` | `var(--acp-error)` | Error, rejected, failed, danger |
-| Error Muted | `#FF44441A` | `var(--acp-error-muted)` | Error backgrounds (10% opacity) |
-| Purple | `#8B5CF6` | `var(--acp-purple)` | Roles, premium, special status |
-| Purple Muted | `#8B5CF61A` | `var(--acp-purple-muted)` | Purple backgrounds (10% opacity) |
+1. **Always use `var(--color-*)` CSS variables** for colors instead of hardcoded hex values.
+2. **Never hardcode hex colors** like `#0C0C0C` or `#FFFFFF` directly in your styles. These will look wrong in the opposite theme.
+3. **Do not implement your own theme toggle.** The Panel handles theme switching globally.
+4. **Test your plugin in both themes.** Toggle the Panel theme in Settings and verify your plugin renders correctly in both dark and light mode.
 
-### Text
+### Quick Example
 
-| Token | Hex | CSS Variable | Usage |
-|-------|-----|--------------|-------|
-| Text Primary | `#FFFFFF` | `var(--acp-text-primary)` | Headings, important values, active text |
-| Text Secondary | `#8a8a8a` | `var(--acp-text-secondary)` | Body text, descriptions, labels |
-| Text Muted | `#6a6a6a` | `var(--acp-text-muted)` | Timestamps, helper text, disabled labels |
-| Text Placeholder | `#4a4a4a` | `var(--acp-text-placeholder)` | Input placeholders, empty state icons |
+```tsx
+{/* WRONG: hardcoded colors break in light mode */}
+<div className="bg-[#0A0A0A] text-[#FFFFFF] border-[#2f2f2f]">
 
-### Borders
-
-| Token | Hex | CSS Variable | Usage |
-|-------|-----|--------------|-------|
-| Border Default | `#2f2f2f` | `var(--acp-border)` | Card borders, input borders, dividers |
-| Border Subtle | `#1A1A1A` | `var(--acp-border-subtle)` | Table row separators, subtle dividers |
-
-### Usage in Tailwind
-
-```html
-<!-- Using hex values directly (always acceptable) -->
-<div class="bg-[#0A0A0A] border border-[#2f2f2f] text-white">
-
-<!-- Using CSS variables (preferred when available) -->
-<div class="bg-[var(--acp-bg-card)] border border-[var(--acp-border)] text-[var(--acp-text-primary)]">
+{/* CORRECT: CSS variables adapt to both themes */}
+<div className="bg-[var(--color-bg-card)] text-[var(--color-text-primary)] border-[var(--color-border)]">
 ```
 
 ---
 
-## 2. Typography
+## 2. Color Tokens
+
+The Panel uses a dark-first design system with light mode support. All colors are available as CSS custom properties injected by the host application.
+
+### Backgrounds
+
+| Token | Hex (dark default) | CSS Variable | Usage |
+|-------|-----|--------------|-------|
+| Page Background | `#0C0C0C` | `var(--color-bg-page)` | Main page background |
+| Sidebar Background | `#080808` | `var(--color-bg-sidebar)` | Sidebar and navigation |
+| Card Background | `#0A0A0A` | `var(--color-bg-card)` | Cards, panels, sections |
+| Elevated Background | `#141414` | `var(--color-bg-elevated)` | Inputs, dropdowns, modals, hover states |
+
+> **Note:** Hex values shown are the dark theme defaults. In light mode these resolve to different values automatically.
+
+### Accent & Status
+
+| Token | Hex (dark default) | CSS Variable | Usage |
+|-------|-----|--------------|-------|
+| Primary Accent | `#00D9FF` | `var(--color-accent)` | Primary buttons, links, active states, focus rings |
+| Accent Hover | `#00C4E8` | `var(--color-accent-hover)` | Hover state for accent-colored elements |
+| Success / Green | `#059669` | `var(--color-green)` | Active, approved, online, running |
+| Warning / Orange | `#FF8800` | `var(--color-orange)` | Pending, warning, queued |
+| Error / Red | `#FF4444` | `var(--color-red)` | Error, rejected, failed, danger |
+| Purple | `#8B5CF6` | `var(--color-purple)` | Roles, premium, special status |
+| Blue | `#3B82F6` | `var(--color-blue)` | Info, links, secondary accent |
+| Gold | `#F59E0B` | `var(--color-gold)` | Featured, starred, premium highlights |
+
+> **Tip:** For muted status backgrounds, use the CSS variable with Tailwind opacity: `bg-[var(--color-green)]/10`.
+
+### Text
+
+| Token | Hex (dark default) | CSS Variable | Usage |
+|-------|-----|--------------|-------|
+| Text Primary | `#FFFFFF` | `var(--color-text-primary)` | Headings, important values, active text |
+| Text Secondary | `#8a8a8a` | `var(--color-text-secondary)` | Body text, descriptions, labels |
+| Text Muted | `#6a6a6a` | `var(--color-text-muted)` | Timestamps, helper text, disabled labels |
+| Text Placeholder | `#4a4a4a` | `var(--color-text-placeholder)` | Input placeholders, empty state icons |
+
+### Borders
+
+| Token | Hex (dark default) | CSS Variable | Usage |
+|-------|-----|--------------|-------|
+| Border Default | `#2f2f2f` | `var(--color-border)` | Card borders, input borders, dividers |
+| Border Subtle | `#1A1A1A` | `var(--color-border-subtle)` | Table row separators, subtle dividers |
+
+### Usage in Tailwind
+
+```html
+<!-- PREFERRED: Using CSS variables (theme-aware, works in both dark and light mode) -->
+<div class="bg-[var(--color-bg-card)] border border-[var(--color-border)] text-[var(--color-text-primary)]">
+
+<!-- AVOID: Hardcoded hex values break in light mode -->
+<div class="bg-[#0A0A0A] border border-[#2f2f2f] text-white">
+```
+
+### Complete Variable Reference
+
+```css
+/* Backgrounds */
+--color-bg-page          /* Main page background */
+--color-bg-sidebar       /* Sidebar and navigation */
+--color-bg-card          /* Cards, panels, sections */
+--color-bg-elevated      /* Inputs, dropdowns, modals, hover states */
+
+/* Accent */
+--color-accent           /* Primary accent (cyan) */
+--color-accent-hover     /* Accent hover state */
+
+/* Status colors */
+--color-green            /* Success, approved, online */
+--color-orange           /* Warning, pending */
+--color-red              /* Error, rejected, danger */
+--color-purple           /* Roles, premium, special */
+--color-blue             /* Info, links */
+--color-gold             /* Featured, starred */
+
+/* Text */
+--color-text-primary     /* Headings, important values */
+--color-text-secondary   /* Body text, descriptions */
+--color-text-muted       /* Timestamps, helper text */
+--color-text-placeholder /* Placeholders, empty states */
+
+/* Borders */
+--color-border           /* Default borders, dividers */
+--color-border-subtle    /* Subtle separators */
+```
+
+---
+
+## 3. Typography
 
 ### Font Families
 
 | Context | Font | Tailwind Class | CSS Variable |
 |---------|------|----------------|--------------|
-| Headings | Space Grotesk | `font-['Space_Grotesk']` | `var(--acp-font-heading)` |
-| Body / UI | Inter | `font-['Inter']` | `var(--acp-font-body)` |
-| Data / Code / Mono | JetBrains Mono | `font-mono` | `var(--acp-font-mono)` |
+| Headings | Space Grotesk | `font-['Space_Grotesk']` | `var(--font-heading)` |
+| Body / UI | Inter | `font-['Inter']` | `var(--font-body)` |
+| Data / Code / Mono | JetBrains Mono | `font-mono` | `var(--font-mono)` |
 
 ### Font Sizes
 
@@ -113,7 +176,7 @@ Use `font-mono` (JetBrains Mono) for:
 
 ---
 
-## 3. Spacing & Layout
+## 4. Spacing & Layout
 
 ### Page Layout
 
@@ -153,11 +216,11 @@ Use `font-mono` (JetBrains Mono) for:
 
 ---
 
-## 4. Component Patterns
+## 5. Component Patterns
 
 Copy-paste ready Tailwind patterns for common UI elements.
 
-### 4.1 Page Header
+### 5.1 Page Header
 
 ```tsx
 <div className="flex items-center justify-between">
@@ -184,7 +247,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.2 Stats Card Row
+### 5.2 Stats Card Row
 
 ```tsx
 <div className="grid grid-cols-4 gap-4">
@@ -242,7 +305,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.3 Tab Navigation
+### 5.3 Tab Navigation
 
 ```tsx
 <div className="flex items-center gap-1 border-b border-[#2f2f2f] mb-6">
@@ -264,7 +327,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.4 Data Table
+### 5.4 Data Table
 
 ```tsx
 {/* Table container */}
@@ -303,7 +366,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
           <span className="text-sm text-[#8a8a8a]">@john_doe</span>
         </td>
         <td className="px-4 py-3">
-          {/* Status badge (see 4.5) */}
+          {/* Status badge (see 5.5) */}
           <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#FF8800]/10 text-[#FF8800]">
             Pending
           </span>
@@ -340,7 +403,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.5 Status Badges
+### 5.5 Status Badges
 
 ```tsx
 {/* Pending / Warning — orange */}
@@ -380,7 +443,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </span>
 ```
 
-### 4.6 Form Inputs
+### 5.6 Form Inputs
 
 ```tsx
 {/* Text input */}
@@ -441,7 +504,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </label>
 ```
 
-### 4.7 Buttons
+### 5.7 Buttons
 
 ```tsx
 {/* Primary button (cyan) */}
@@ -486,7 +549,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </button>
 ```
 
-### 4.8 Empty States
+### 5.8 Empty States
 
 ```tsx
 <div className="flex flex-col items-center justify-center py-20">
@@ -503,7 +566,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.9 Loading States
+### 5.9 Loading States
 
 ```tsx
 {/* Spinner (inline) */}
@@ -543,7 +606,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.10 Card Containers
+### 5.10 Card Containers
 
 ```tsx
 {/* Standard card */}
@@ -584,7 +647,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.11 Modal / Dialog
+### 5.11 Modal / Dialog
 
 ```tsx
 {/* Modal overlay */}
@@ -616,7 +679,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 </div>
 ```
 
-### 4.12 Toast / Notification
+### 5.12 Toast / Notification
 
 ```tsx
 {/* Success toast */}
@@ -647,11 +710,11 @@ Copy-paste ready Tailwind patterns for common UI elements.
 
 ---
 
-## 5. Do's and Don'ts
+## 6. Do's and Don'ts
 
 ### DO
 
-- **DO** use the CSS custom properties (`var(--acp-*)`) when available, falling back to hex values.
+- **DO** use the CSS custom properties (`var(--color-*)`) for all colors. This ensures your plugin works in both dark and light themes.
 - **DO** use `lucide-react` for all icons. Use size 16 for inline/table contexts and size 20 for navigation/headers.
 - **DO** use `font-mono` (JetBrains Mono) for data values, IDs, counts, and timestamps.
 - **DO** use `font-['Space_Grotesk']` for page-level headings.
@@ -667,7 +730,8 @@ Copy-paste ready Tailwind patterns for common UI elements.
 - **DON'T** use custom colors outside the defined palette. If you need a color not in the system, request it through the SDK issue tracker.
 - **DON'T** use fonts other than Space Grotesk, Inter, and JetBrains Mono.
 - **DON'T** hardcode pixel values for common spacing. Use Tailwind's spacing scale (`gap-4`, `p-5`, `px-8`, etc.).
-- **DON'T** use bright/saturated backgrounds. The Panel is dark-first; all backgrounds should be near-black.
+- **DON'T** hardcode hex color values. Always use `var(--color-*)` CSS variables so your plugin adapts to both dark and light themes.
+- **DON'T** use bright/saturated backgrounds. The Panel is dark-first; all backgrounds should use the `--color-bg-*` variables.
 - **DON'T** use `box-shadow` for elevation. Use subtle borders (`border-[#2f2f2f]`) instead.
 - **DON'T** override the host application's global styles. Your plugin runs inside the Panel's layout.
 - **DON'T** use inline styles when Tailwind classes are available.
@@ -677,7 +741,7 @@ Copy-paste ready Tailwind patterns for common UI elements.
 
 ---
 
-## 6. Accessibility
+## 7. Accessibility
 
 ### Contrast Ratios
 
@@ -737,9 +801,9 @@ focus-visible:outline-2 focus-visible:outline-[#00D9FF] focus-visible:outline-of
 
 ---
 
-## 7. Dark Theme Notes
+## 8. Dark Theme Notes
 
-The ADMINCHAT Panel is dark-only. There is no light theme toggle. All plugin designs must work exclusively on dark backgrounds.
+The ADMINCHAT Panel defaults to a dark theme but also supports light mode. Plugin designs should use `var(--color-*)` CSS variables to work correctly in both themes.
 
 ### Background Hierarchy (darkest to lightest)
 

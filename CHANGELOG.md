@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.1] - 2026-03-28
+
+### Changed
+- **Design System Kit** — Updated all CSS variable names from `--acp-*` prefix to `--color-*` prefix to match what the host Panel actually provides (`--color-bg-page`, `--color-accent`, `--color-text-primary`, etc.)
+- **Design System Kit** — Updated section numbering to accommodate new Theme Support section
+- **Design System Kit** — Updated Do's and Don'ts to emphasize using CSS variables over hardcoded hex values
+
+### Added
+- **Theme Support section** in Design System Kit — Documents the dual theme system (dark default + light mode), explains that `var(--color-*)` variables auto-adapt when the user toggles theme, and warns against hardcoding hex colors
+- **Complete Variable Reference** — Added a full CSS variable listing in the Color Tokens section for quick reference
+- New status color variables: `--color-blue` and `--color-gold`
+
 ## [0.2.0] - 2026-03-28
 
 ### Changed
